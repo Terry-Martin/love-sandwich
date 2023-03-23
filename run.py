@@ -2,7 +2,7 @@
 import gspread
 
 from google.oauth2.service_account import Credentials
-from pprint import pprint
+# from pprint import pprint
 
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -86,6 +86,38 @@ def calulate_suplus_data(sales_row):
     return surplus_data
 
 
+def get_last_5_entries_sales():
+    """
+    Collects columns of data from sales worksheet, colling
+    the last 5 entries for each sandwich and returns the
+    data as a list of lists.
+    """
+    sales = SHEET.worksheet("sales")
+
+    columns = []
+    for ind in range(1, 7):
+        column = sales.col_values(ind)
+        columns.append(column[-5:])
+
+    return columns
+
+
+def calculate_stock_data(data):
+    """
+    Calculate the average stock for each item type, adding 10%
+    """
+    print("Calculating stock data...\n")
+    new_stock_data = []
+
+    for column in data:
+        int_column = [int(num) for num in column]
+        average = sum(int_column) / len(int_column)
+        stock_num = average * 1.1
+        new_stock_data.append(round(stock_num))
+
+    return new_stock_data
+
+
 def main():
     """
     Run all program functions
@@ -93,10 +125,11 @@ def main():
     data = get_sales_data()
     sales_data = [int(num) for num in data]
     update_worksheet(sales_data, "sales")
-    new_surplus_data = calulate_suplus_data(sales_data) 
-    print(new_surplus_data)
-
-    update_worksheet(new_surplus_data, "surplus") 
+    new_surplus_data = calulate_suplus_data(sales_data)
+    update_worksheet(new_surplus_data, "surplus")
+    sales_columns = get_last_5_entries_sales()
+    stock_data = calculate_stock_data(sales_columns)
+    update_worksheet(stock_data, "stock")
 
 
 print("Welcome to Love Sandiches Data Automation\n")
