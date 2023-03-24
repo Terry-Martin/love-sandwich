@@ -117,6 +117,19 @@ def calculate_stock_data(data):
     return new_stock_data
 
 
+def get_stock_values(data):
+    """
+    Create dictionary to show how many of each sandwich needs to be made
+    """
+    headings = SHEET.worksheet("stock").row_values(1)
+
+    # sandwiches_to_make = {}
+    sandwiches_to_make = {heading: value
+                          for heading, value in zip(headings, data)}
+
+    print(f"We need to make these: {sandwiches_to_make}")
+
+
 def main():
     """
     Run all program functions
@@ -129,18 +142,8 @@ def main():
     sales_columns = get_last_5_entries_sales()
     stock_data = calculate_stock_data(sales_columns)
     update_worksheet(stock_data, "stock")
-    return stock_data
-
-
-def get_stock_values():
-    """
-    Create dictionary to show how many of each sandwich needs to be made
-    """
-    headings = SHEET.worksheet("stock").get_all_values()
-    headings_row = headings[0]
-    print(f"This WILL work: {headings_row}")
+    get_stock_values(stock_data)
 
 
 print("Welcome to Love Sandiches Data Automation\n")
 main()
-get_stock_values()
